@@ -21,6 +21,14 @@ Pelo shell, sem abrir o `claude`:
 claude plugin install ajuda-mentor --marketplace VAMOO-AI/ajuda-mentor
 ```
 
+Por esse caminho o endereço e o token não são pedidos. Depois de instalar, abra o `claude` e rode:
+
+```
+/plugin configure ajuda-mentor@ajuda-mentor
+```
+
+O mesmo comando serve para trocar o token depois.
+
 No app desktop, onde `/plugin` não roda: clique no + ao lado da caixa do prompt, depois em Plugins, Add marketplace com `VAMOO-AI/ajuda-mentor` e Add plugin. Instalado pelo terminal no escopo de usuário, o mod também funciona no desktop.
 
 O token é pessoal. Não coloque no grupo, num repositório ou num print. Se vazar, avise o mentor para ele trocar.
@@ -30,7 +38,7 @@ O token é pessoal. Não coloque no grupo, num repositório ou num print. Se vaz
 | Comando | O que faz |
 |---|---|
 | `/ajuda-mentor` | Resume o problema da conversa atual e mostra a prévia |
-| `/ajuda-mentor o deploy dá 401` | O mesmo, partindo da sua descrição |
+| `/ajuda-mentor o deploy dá 401` | O mesmo, partindo da sua descrição. Numa sessão nova, sem conversa, o resumo sai só dessa descrição |
 | `/ajuda-mentor enviar ABCD` | Envia a prévia de código ABCD, quando não há painel para clicar |
 | `/ajuda-mentor cancelar` | Descarta a prévia sem enviar nada |
 

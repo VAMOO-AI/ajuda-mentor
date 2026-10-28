@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import type { EngineInterface, Register } from 'claude-code'
+import type { EngineInterface, ModelForkResult, Register } from 'claude-code'
 
 import type { Etapa, Rascunho } from '../types'
 import { montarRascunho, pedidoDoResumo, repoDe, SEM_PROBLEMA } from './rascunho'
@@ -93,9 +93,16 @@ async function branchAtual($: EngineInterface, pasta: string | null): Promise<st
   }
 }
 
+async function resumir($: EngineInterface, descricao: string): Promise<ModelForkResult> {
+  const r = await $.model.fork({ prompt: pedidoDoResumo(descricao) })
+  if (r.isAnswered || r.reason !== 'nothing-to-fork' || !descricao) return r
+  // Sessão nova ou retomada: o fork ainda não tem conversa, então o resumo sai só da descrição.
+  return $.model.complete({ model: 'haiku', prompt: pedidoDoResumo(descricao, 'descricao') })
+}
+
 async function gerar($: EngineInterface, descricao: string): Promise<string> {
   await definirEtapa($, 'gerando', null)
-  const resposta = await $.model.fork({ prompt: pedidoDoResumo(descricao) })
+  const resposta = await resumir($, descricao)
   if (!resposta.isAnswered) {
     const texto = MOTIVO_FORK[resposta.reason] ?? `Não consegui montar o resumo (${resposta.reason}).`
     await definirEtapa($, 'erro', texto)
