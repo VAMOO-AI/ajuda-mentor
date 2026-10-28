@@ -5,9 +5,12 @@ export const LIMITE_TEXTO = 1500
 
 export const SEM_PROBLEMA = 'SEM_PROBLEMA'
 
-export const pedidoDoResumo = (descricao: string): string =>
+// `descricao` como fonte: sessão nova ou retomada, sem conversa que o fork possa ler.
+export const pedidoDoResumo = (descricao: string, fonte: 'conversa' | 'descricao' = 'conversa'): string =>
   [
-    'Escreva, em português, um pedido de ajuda que o mentorado vai mandar ao mentor sobre o problema desta conversa.',
+    fonte === 'conversa'
+      ? 'Escreva, em português, um pedido de ajuda que o mentorado vai mandar ao mentor sobre o problema desta conversa.'
+      : 'Escreva, em português, um pedido de ajuda que o mentorado vai mandar ao mentor, usando só a descrição abaixo. Não invente o que ela não diz.',
     descricao ? `O mentorado descreveu assim: "${descricao}".` : '',
     'Formato, nesta ordem e sem nada antes:',
     'Título: <uma linha>',

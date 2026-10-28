@@ -33,7 +33,10 @@ const PANE = {
 type Post = { url: string; headers: Record<string, string>; body: string }
 
 // O que fica abaixo do plugin: cada hook aqui faz o papel do engine.
-const motor = (on: On, opcoes: { forkTexto?: string; status?: number; isPlaced?: boolean } = {}) => {
+const motor = (
+  on: On,
+  opcoes: { forkTexto?: string; status?: number; isPlaced?: boolean; semConversa?: boolean; avulsos?: string[] } = {},
+) => {
   const posts: Post[] = []
   mock.clock(on)
   on('session.start', (_, e) => ({ cwd: e.cwd }))
@@ -46,9 +49,16 @@ const motor = (on: On, opcoes: { forkTexto?: string; status?: number; isPlaced?:
   on('process.run', () => ({
     value: { exitCode: 0, stdout: 'feat/webhook\n', stderr: '', isStdoutTruncated: false, isStderrTruncated: false },
   }))
+  const usage = { input_tokens: 1, output_tokens: 1, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 }
   on('model.fork', () => ({
-    value: { isAnswered: true, text: opcoes.forkTexto ?? RESUMO, usage: { input_tokens: 1, output_tokens: 1, cache_creation_input_tokens: 0, cache_read_input_tokens: 0 } },
+    value: opcoes.semConversa
+      ? { isAnswered: false as const, reason: 'nothing-to-fork' as const }
+      : { isAnswered: true as const, text: opcoes.forkTexto ?? RESUMO, usage },
   }))
+  on('model.complete', (_, e) => {
+    opcoes.avulsos?.push(e.prompt)
+    return { value: { isAnswered: true as const, text: RESUMO, usage } }
+  })
   on('http.fetch', (_, e) => {
     const init = (e as { init?: { headers?: Record<string, string>; body?: string } }).init ?? {}
     posts.push({ url: String((e as { url: string }).url), headers: init.headers ?? {}, body: init.body ?? '' })
@@ -160,6 +170,26 @@ test('erro HTTP mantém o rascunho e permite tentar de novo', OPCOES, async ($, 
   const outra = await rodar($, `enviar ${codigo}`)
   expect(outra).toContain('token recusado')
   expect(posts.length).toBe(2)
+})
+
+test('sessão sem conversa usa a descrição da pessoa', OPCOES, async ($, on) => {
+  const avulsos: string[] = []
+  const posts = motor(on, { isPlaced: false, semConversa: true, avulsos })
+  await iniciar($)
+  const previa = await rodar($, 'o deploy da edge function dá 401')
+  expect(previa).toContain('Pedido de ajuda · código')
+  expect(avulsos.length).toBe(1)
+  expect(avulsos[0]).toContain('o deploy da edge function dá 401')
+  expect(posts.length).toBe(0)
+})
+
+test('sessão sem conversa e sem descrição pede a descrição', OPCOES, async ($, on) => {
+  const avulsos: string[] = []
+  motor(on, { isPlaced: false, semConversa: true, avulsos })
+  await iniciar($)
+  const r = await rodar($, '')
+  expect(r).toContain('Descreva o problema')
+  expect(avulsos.length).toBe(0)
 })
 
 test('cancelar descarta e nada sai', OPCOES, async ($, on) => {

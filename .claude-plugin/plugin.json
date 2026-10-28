@@ -1,6 +1,6 @@
 {
   "name": "ajuda-mentor",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Monta um pedido de ajuda a partir da conversa, mostra a prévia mascarada e só envia ao mentor quando você confirma",
   "types": "./types/index.d.ts",
   "userConfig": {
