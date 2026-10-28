@@ -1,0 +1,5 @@
+{
+  "name": "ajuda-mentor",
+  "owner": { "name": "VAMOO AI" },
+  "plugins": [{ "name": "ajuda-mentor", "source": "./" }]
+}

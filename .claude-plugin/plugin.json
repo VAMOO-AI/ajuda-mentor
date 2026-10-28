@@ -1,0 +1,21 @@
+{
+  "name": "ajuda-mentor",
+  "version": "0.1.0",
+  "description": "Monta um pedido de ajuda a partir da conversa, mostra a prévia mascarada e só envia ao mentor quando você confirma",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "webhook_url": {
+      "type": "string",
+      "title": "Endereço do webhook da mentoria",
+      "description": "URL que o mentor te passou. O pedido é enviado para lá só quando você confirma.",
+      "default": ""
+    },
+    "token": {
+      "type": "string",
+      "title": "Seu token pessoal",
+      "description": "Token que o mentor gerou para você. Identifica quem pede ajuda e para qual grupo vai.",
+      "sensitive": true,
+      "default": ""
+    }
+  }
+}
